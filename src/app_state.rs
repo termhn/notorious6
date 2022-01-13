@@ -216,7 +216,7 @@ impl AppState {
         }
 
         // Create new encoder that writes to a file with maximum quality (100)
-        let encoder = Encoder::new_file(file_path, 90)
+        let encoder = Encoder::new_file(file_path, 100)
             .with_context(|| format!("Failed to create {:?}", file_path))?;
 
         encoder
