@@ -49,15 +49,10 @@
 // parts of the gamut being compressed.
 #define GAMUT_COMPRESS_BIAS 0.1
 
-// The percentage distance outisde the output gamut boundary to compress to the gamut boundary, i.e. a value of 0.2
-// will compress a color with distance 1.2 from the output gamut boundary to the edge of the output gamut.
-// You can control this per tristimulus component.
-#define GAMUT_COMPRESS_DISTANCE_LIMITS float3(1.5, 1.5, 1.5) // TODO, this should be calculated better based on input and output gamut and how much HK adjustment can cause it to go further out of gamut
-
 // Controls for manual desaturation of lighter than "white" stimulus (greens, yellows);
 // see comments in the code for more details.
-#define CHROMA_ATTENUATION_START 0.0
-#define CHROMA_ATTENUATION_EXPONENT 4.0
+#define GLOBAL_CHROMA_ATTENUATION_START 0.0
+#define GLOBAL_CHROMA_ATTENUATION_EXPONENT 4.0
 // ----------------------------------------------------------------
 
 
@@ -108,9 +103,9 @@ float3 gamut_compress_to_achromatic_luminance(float3 rgb, float achromatic_lumin
     // This "fixes" the yellows and greens.
     const float supplemental_chroma_attenuation = pow(
         saturate(
-            (achromatic_luminance - 1.0 * CHROMA_ATTENUATION_START)
-            / (1.0 - CHROMA_ATTENUATION_START)
-        ), CHROMA_ATTENUATION_EXPONENT
+            (achromatic_luminance - 1.0 * GLOBAL_CHROMA_ATTENUATION_START)
+            / (1.0 - GLOBAL_CHROMA_ATTENUATION_START)
+        ), GLOBAL_CHROMA_ATTENUATION_EXPONENT
     );
 
     lab = lerp(lab, float3(L0, 0.0, 0.0), supplemental_chroma_attenuation);
