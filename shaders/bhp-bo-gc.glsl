@@ -9,14 +9,6 @@
 #include "inc/h-k.hlsl"
 #include "inc/ycbcr.hlsl"
 
-// The space to perform chroma attenuation in. More details in the `compress_stimulus` function.
-// Oklab works best, with ICtCp being a close second.
-// LUV and None don't provide Abney correction.
-#define PERCEPTUAL_SPACE_OKLAB 0
-#define PERCEPTUAL_SPACE_LUV 1
-#define PERCEPTUAL_SPACE_ICTCP 2
-#define PERCEPTUAL_SPACE_NONE 3
-
 // Helmholtz-Kohlrausch adjustment methods
 #define HK_ADJUSTMENT_METHOD_NAYATANI 0
 #define HK_ADJUSTMENT_METHOD_NONE 1
@@ -29,9 +21,6 @@
 // Configurable stuff:
 
 #define BRIGHTNESS_COMPRESSION_CURVE BRIGHTNESS_COMPRESSION_CURVE_SIRAGUSANO_SMITH
-
-// Choose the perceptual space for chroma attenuation.
-#define PERCEPTUAL_SPACE PERCEPTUAL_SPACE_OKLAB
 
 // Choose the method for performing the H-K adjustment
 #define HK_ADJUSTMENT_METHOD HK_ADJUSTMENT_METHOD_NAYATANI
@@ -71,21 +60,6 @@
 #define CHROMA_ATTENUATION_EXPONENT 4.0
 // ----------------------------------------------------------------
 
-
-// Based on the selection, define `linear_to_perceptual` and `perceptual_to_linear`
-#if PERCEPTUAL_SPACE == PERCEPTUAL_SPACE_OKLAB
-	#define linear_to_perceptual(col) linear_srgb_to_oklab(col)
-	#define perceptual_to_linear(col) oklab_to_linear_srgb(col)
-#elif PERCEPTUAL_SPACE == PERCEPTUAL_SPACE_LUV
-	#define linear_to_perceptual(col) xyzToLuv(RGBToXYZ(col))
-	#define perceptual_to_linear(col) XYZtoRGB(luvToXyz(col))
-#elif PERCEPTUAL_SPACE == PERCEPTUAL_SPACE_ICTCP
-	#define linear_to_perceptual(col) LinearBT709_to_ICtCp(col)
-	#define perceptual_to_linear(col) ICtCp_to_LinearBT709(col)
-#elif PERCEPTUAL_SPACE == PERCEPTUAL_SPACE_NONE
-	#define linear_to_perceptual(col) (col)
-	#define perceptual_to_linear(col) (col)
-#endif
 
 // Map (hk-adjusted) scene-linear luminance through a curve yielding values in 0..1, yielding display-linear luminance
 float compress_luminance(float v) {
